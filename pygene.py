@@ -3,30 +3,75 @@ Python module pygene created by Souradeep Das (github.com/souradeepdas-iisc/)
 
 Initially the gene_primitive.py module created in 2020. This is a modified version designed using OOPs.
 
+This is a DNA:
+    
+    5' - A-T-G-C-A-T-G-C-..... - 3'
+    3' - T-A-C-G-T-A-C-G-..... - 5'
+    
+            ^ Y
+            |
+            |
+            |______ X
+           /
+          /
+         / Z
+  
 """
 
 dict_AA = {'phe': ['Phe', 'UUU', 'UUC'], 'leu': ['Leu', 'UUA', 'UUG', 'CUU', 'CUC', 'CUA', 'CUG'],
            'ile': ['Ile', 'AUU', 'AUC', 'AUA'], 'met': ['Met', 'AUG'], 'val': ['Val', 'GUU', 'GUC', 'GUA', 'GUG'],
-           'ser': ['Ser', 'UCU', 'UCC', 'UCA', 'UCG'], 'pro': ['Pro', 'CCU', 'CCC', 'CCA', 'CCG'],
+           'ser': ['Ser', 'UCU', 'UCC', 'UCA', 'UCG', 'AGU', 'AGC'], 'pro': ['Pro', 'CCU', 'CCC', 'CCA', 'CCG'],
            'thr': ['Thr', 'ACU', 'ACC', 'ACA', 'ACG'], 'ala': ['Ala', 'GCU', 'GCC', 'GCA', 'GCG'],
            'tyr': ['Tyr', 'UAU', 'UAC'], 'his': ['His', 'CAU', 'CAC'], 'gln': ['Gln', 'CAA', 'CAG'],
            'asn': ['Asn', 'AAU', 'AAC'], 'lys': ['Lys', 'AAA', 'AAG'], 'asp': ['Asp', 'GAU', 'GAC'],
            'glu': ['Glu', 'GAA', 'GAG'], 'cys': ['Cys', 'UGU', 'UGC'], 'trp': ['Trp', 'UGG'],
-           'arg': ['Arg', 'CGU', 'CGC', 'CGA', 'CGG', 'AGA', 'AGG'], 'ser': ['Ser', 'AGU', 'AGC'],
+           'arg': ['Arg', 'CGU', 'CGC', 'CGA', 'CGG', 'AGA', 'AGG'], 
            'gly': ['Gly', 'GGU', 'GGC', 'GGA', 'GGG'], 'stop': ['UAA', 'UAG', 'UGA']}
+
+dict_DNA={'A':'T', 'T':'A', 'C':'G', 'G':'C'}
+dict_RNA={'A':'U', 'U':'A', 'C':'G', 'G':'C'}
+
+DNA_symbols=['A', 'T', 'C', 'G', '-', ' ']
+
+dict_seq={'D': dict_DNA, 'R':dict_RNA}
+
+dict_pol_53={True: ['5','3'], False: ['3','5']}
+
+def separate_str(seq, sep=''):
+    str1=seq[0]
+    for i in seq[1:]:
+        str1+=sep+i
+    return str1
 
 
 class Seq:
     # Default data type is string
     def __init__(self, seq, form='D'):
-        self.seq = seq
-        self.form = form
+        self.seq = seq.upper()
+        self.form = form.upper()
+        pass
 
     def convert_list(self):
+        '''
+
+        Returns
+        -------
+        List
+            Converts any string into a list. Analogous to list().
+
+        '''
         seq1 = self.seq
         return list(seq1)
 
     def reverse(self):
+        '''
+        
+        Returns
+        -------
+        String
+            Converts any string to its reverse string.
+
+        '''
         seq1 = self.seq
         seq_rev = ''
         for i in seq1:
@@ -34,23 +79,78 @@ class Seq:
         return Seq(seq_rev, self.form)
 
     def print_seq(self):
-        print(self.seq)
+        print(separate_str(self.seq))
         pass
 
-    def seq_form(self):
+    def get_form(self):
         return self.form
 
+    def get_seq(self):
+        return self.seq
+    
+    def complement(self):
+        '''
+        
 
+        Returns
+        -------
+        Seq object
+            Returns the complement sequence of the input sequence.
+            The polarity of output sequence is 3'-5' for input sequence of polarity 5'-3'.
 
+        '''
+        dict1=dict_seq[self.form]
+        seq1=self.seq
+        seq2=''
+        for char in seq1:
+            seq2+=dict1[char]
+        return Seq(seq2, self.form)
+    
+    def comp_reversed(self):
+        return self.complement().reverse()
 
 
 class DNAseq(Seq):
-    def __init__(self, seq):
-        self.seq = seq
-        self.form = 'D'
+    def __init__(self, seq, pol_53=True):
+        #pol_53 denotes whether the DNA is in 5'-3' polarity or not
+        super().__init__(seq, 'D')
+        self.compseq = self.complement().seq
+        self.pol_53=pol_53
+        pass
+    
+    def is_valid(self):
+        for char in self.seq:
+            if char not in DNA_symbols:
+                return 0
+        return 1
+    
+    def flip_x(self):
+        return DNAseq(self.compseq, pol_53= not self.pol_53)
+    
+    def flip_y(self):
+        Seq1=Seq(self.seq)
+        seqn1=Seq1.reverse().seq
+        return DNAseq(seqn1, pol_53= not self.pol_53)
 
+    def flip_z(self):
+        Seq1=Seq(self.compseq)
+        seqn1=Seq1.reverse().seq
+        return DNAseq(seqn1, pol_53= self.pol_53)
+    
+    def print_seq(self, sep=''):
+        str1=separate_str(self.seq, sep)
+        str2=separate_str(self.compseq, sep)
+        TL=dict_pol_53[self.pol_53][0]#number on top-left
+        TR=dict_pol_53[self.pol_53][1]#number on top-right
+        
+        print(TL+"' - "+str1+" - "+TR+"'")
+        print(TR+"' - "+str2+" - "+TL+"'")
+        pass
+        
+    def analyze(self):
+        pass
 
-
+#%%
 class RNAseq(Seq):
     def __init__(self, seq):
         self.seq = seq
