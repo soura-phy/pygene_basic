@@ -23,18 +23,24 @@ class Seq:
         self.form = form
 
     def convert_list(self):
-        str = self.seq
-        return list(str)
+        seq1 = self.seq
+        return list(seq1)
 
     def reverse(self):
-        str = self.seq
-        str_rev = ''
-        for i in str:
-            str_rev = i + str_rev
-        return Seq(str_rev, self.form)
+        seq1 = self.seq
+        seq_rev = ''
+        for i in seq1:
+            seq_rev = i + seq_rev
+        return Seq(seq_rev, self.form)
 
     def print_seq(self):
+        print(self.seq)
         pass
+
+    def seq_form(self):
+        return self.form
+
+
 
 
 
@@ -44,12 +50,11 @@ class DNAseq(Seq):
         self.form = 'D'
 
 
+
 class RNAseq(Seq):
     def __init__(self, seq):
         self.seq = seq
         self.form = 'R'
-
-
 
 
 def compDNA(strand):
